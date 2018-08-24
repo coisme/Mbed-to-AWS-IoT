@@ -29,6 +29,7 @@
 #define MQTTCLIENT_QOS2 0
 
 #include "easy-connect.h"
+#include "NTPClient.h"
 #include "MQTTNetwork.h"
 #include "MQTTmbed.h"
 #include "MQTTClient.h"
@@ -88,6 +89,13 @@ int main(int argc, char* argv[])
     }
     printf("Network interface opened successfully.\r\n");
     printf("\r\n");
+
+    // sync the real time clock (RTC)
+    NTPClient ntp(network);
+    ntp.set_server("time.google.com", 123);
+    time_t now = ntp.get_timestamp();
+    set_time(now);
+    printf("Time is now %s", ctime(&now));
 
     printf("Connecting to host %s:%d ...\r\n", MQTT_SERVER_HOST_NAME, MQTT_SERVER_PORT);
     {
