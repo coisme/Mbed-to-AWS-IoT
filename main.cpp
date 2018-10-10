@@ -28,7 +28,7 @@
 #define MQTTCLIENT_QOS1 0
 #define MQTTCLIENT_QOS2 0
 
-#include "easy-connect.h"
+#include "mbed.h"
 #include "NTPClient.h"
 #include "MQTTNetwork.h"
 #include "MQTTmbed.h"
@@ -43,20 +43,34 @@
 
 static volatile bool isPublish = false;
 
+/* Flag to be set when received a message from the server. */
+static volatile bool isMessageArrived = false;
+/* Buffer size for a receiving message. */
+const int MESSAGE_BUFFER_SIZE = 1024;
+/* Buffer for a receiving message. */
+char messageBuffer[MESSAGE_BUFFER_SIZE];
+
+// An event queue is a very useful structure to debounce information between contexts (e.g. ISR and normal threads)
+// This is great because things such as network operations are illegal in ISR, so updating a resource in a button's fall() function is not allowed
+EventQueue eventQueue;
+Thread thread1;
+
 /*
  * Callback function called when a message arrived from server.
  */
 void messageArrived(MQTT::MessageData& md)
 {
-    /* TODO: Move printf to outside interrupt context. */
+    // Copy payload to the buffer.
     MQTT::Message &message = md.message;
-    printf("\r\n");
-    printf("! Message arrived: qos %d, retained %d, dup %d, packetid %d\r\n",
-            message.qos, message.retained, message.dup, message.id);
-    printf("! Payload %.*s\r\n", message.payloadlen, (char*)message.payload);
-    printf("\r\n");
+    memcpy(messageBuffer, message.payload, message.payloadlen);
+    messageBuffer[message.payloadlen] = '\0';
+
+    isMessageArrived = true;
 }
 
+/*
+ * Callback function called when the button1 is clicked.
+ */
 void btn1_rise_handler() {
     isPublish = true;
 }
@@ -66,25 +80,32 @@ int main(int argc, char* argv[])
 {
     mbed_trace_init();
     
-    const float version = 0.8;
+    const float version = 0.9;
     bool isSubscribed = false;
 
     NetworkInterface* network = NULL;
     MQTTNetwork* mqttNetwork = NULL;
     MQTT::Client<MQTTNetwork, Countdown>* mqttClient = NULL;
 
-    DigitalOut led_red(LED_RED, LED_OFF);
-    DigitalOut led_green(LED_GREEN, LED_ON);
-    DigitalOut led_blue(LED_BLUE, LED_OFF);
+    DigitalOut led_red(LED1, LED_OFF);
+    DigitalOut led_green(LED2, LED_ON);
+    DigitalOut led_blue(LED3, LED_OFF);
 
     printf("HelloMQTT: version is %.2f\r\n", version);
     printf("\r\n");
 
     printf("Opening network interface...\r\n");
     {
-        network = easy_connect(true);    // If true, prints out connection details.
+        network = NetworkInterface::get_default_instance();
         if (!network) {
-            printf("Unable to open network interface.\r\n");
+            printf("Error! No network inteface found.\n");
+            return -1;
+        }
+
+        printf("Connecting to network\n");
+        nsapi_size_or_error_t ret = network->connect();
+        if (ret) {
+            printf("Unable to connect! returned %d\n", ret);
             return -1;
         }
     }
@@ -164,15 +185,24 @@ int main(int argc, char* argv[])
 
 
     while(1) {
+        /* Check connection */
         if(!mqttClient->isConnected()){
             break;
         }
-        if(mqttClient->yield(100) != MQTT::SUCCESS) {
+        /* Pass control to other thread. */
+        if(mqttClient->yield() != MQTT::SUCCESS) {
             break;
         }
+        /* Received a control message. */
+        if(isMessageArrived) {
+            isMessageArrived = false;
+            // Just print it out here.
+            printf("\r\nMessage arrived:\r\n%s\r\n", messageBuffer);
+        }
+        /* Publish data */
         if(isPublish) {
             isPublish = false;
-            static unsigned int id = 0;
+            static unsigned short id = 0;
             static unsigned int count = 0;
 
             count++;
@@ -190,8 +220,12 @@ int main(int argc, char* argv[])
 
             message.qos = MQTT::QOS0;
             message.id = id++;
-            sprintf(buf, "%d", count);
-            message.payloadlen = strlen(buf)+1;
+            int ret = snprintf(buf, buf_size, "%d", count);
+            if(ret < 0) {
+                printf("ERROR: snprintf() returns %d.", ret);
+                continue;
+            }
+            message.payloadlen = ret;
             // Publish a message.
             printf("Publishing message.\r\n");
             int rc = mqttClient->publish(MQTT_TOPIC_SUB, message);
