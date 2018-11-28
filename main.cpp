@@ -38,15 +38,15 @@
 #include "mbed_events.h"
 #include "mbedtls/error.h"
 
-#define LED_ON 0
-#define LED_OFF 1
+#define LED_ON  MBED_CONF_APP_LED_ON
+#define LED_OFF MBED_CONF_APP_LED_OFF
 
 static volatile bool isPublish = false;
 
 /* Flag to be set when received a message from the server. */
 static volatile bool isMessageArrived = false;
 /* Buffer size for a receiving message. */
-const int MESSAGE_BUFFER_SIZE = 1024;
+const int MESSAGE_BUFFER_SIZE = 256;
 /* Buffer for a receiving message. */
 char messageBuffer[MESSAGE_BUFFER_SIZE];
 
@@ -87,9 +87,7 @@ int main(int argc, char* argv[])
     MQTTNetwork* mqttNetwork = NULL;
     MQTT::Client<MQTTNetwork, Countdown>* mqttClient = NULL;
 
-    DigitalOut led_red(LED1, LED_OFF);
-    DigitalOut led_green(LED2, LED_ON);
-    DigitalOut led_blue(LED3, LED_OFF);
+    DigitalOut led(MBED_CONF_APP_LED_PIN, LED_ON);
 
     printf("HelloMQTT: version is %.2f\r\n", version);
     printf("\r\n");
@@ -162,8 +160,6 @@ int main(int argc, char* argv[])
     printf("Client connected.\r\n");
     printf("\r\n");
 
-    // Turn off the green LED
-    led_green = LED_OFF;
 
     printf("Client is trying to subscribe a topic \"%s\".\r\n", MQTT_TOPIC_SUB);
     {
@@ -178,11 +174,13 @@ int main(int argc, char* argv[])
     printf("\r\n");
 
     // Enable button 1
-    InterruptIn btn1 = InterruptIn(BUTTON1);
+    InterruptIn btn1 = InterruptIn(MBED_CONF_APP_USER_BUTTON);
     btn1.rise(btn1_rise_handler);
     
-    printf("To send a packet, push the button 1 on your board.\r\n");
+    printf("To send a packet, push the button 1 on your board.\r\n\r\n");
 
+    // Turn off the LED to let users know connection process done.
+    led = LED_OFF;
 
     while(1) {
         /* Check connection */
@@ -197,7 +195,7 @@ int main(int argc, char* argv[])
         if(isMessageArrived) {
             isMessageArrived = false;
             // Just print it out here.
-            printf("\r\nMessage arrived:\r\n%s\r\n", messageBuffer);
+            printf("\r\nMessage arrived:\r\n%s\r\n\r\n", messageBuffer);
         }
         /* Publish data */
         if(isPublish) {
@@ -208,7 +206,7 @@ int main(int argc, char* argv[])
             count++;
 
             // When sending a message, LED lights blue.
-            led_blue = LED_ON;
+            led = LED_ON;
 
             MQTT::Message message;
             message.retained = false;
@@ -235,7 +233,7 @@ int main(int argc, char* argv[])
             printf("Message published.\r\n");
             delete[] buf;    
 
-            led_blue = LED_OFF;
+            led = LED_OFF;
         }
     }
 
@@ -258,6 +256,4 @@ int main(int argc, char* argv[])
         network->disconnect();
         // network is not created by new.
     }
-
-//    exit(0);
 }

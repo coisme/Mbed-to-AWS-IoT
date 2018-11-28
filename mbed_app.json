@@ -3,22 +3,54 @@
     ],
     "config": {
         "main-stack-size": {
-            "value": 8192
+            "value": 4096
+        },
+        "led-pin": {
+            "help": "LED pin.",
+            "required": true
+        },
+        "led-on": {
+            "help": "Digital pin state when LED is turned on.",
+            "required": true
+        },
+        "led-off": {
+            "help": "Digital pin state when LED is turned off.",
+            "required": true
+        },
+        "user-button": {
+            "help": "Push Button to send a packet.",
+            "required": true
         }
     },
     "target_overrides": {
         "*": {
-            "target.features_add": ["NANOSTACK", "LOWPAN_ROUTER", "COMMON_PAL"],
             "target.network-default-interface-type": "ETHERNET",
-            "nsapi.default-wifi-security": "WPA_WPA2",
-            "nsapi.default-wifi-ssid": "\"mbed\"",
-            "nsapi.default-wifi-password": "\"mbed2014\"",
             "mbed-trace.enable": null,
             "tls-socket.debug-level": 0,
             "platform.stdio-baud-rate": 115200,
             "platform.stdio-convert-newlines": false
            },
+        "K64F": {
+            "led-pin": "LED3",
+            "led-on": 0,
+            "led-off": 1,
+            "user-button": "BUTTON1"
+        },
+        "DISCO_L475VG_IOT01A": {
+            "led-pin": "LED1",
+            "led-on": 0,
+            "led-off": 1,
+            "user-button": "USER_BUTTON",
+            "target.network-default-interface-type" : "WIFI",
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"SSID\"",
+            "nsapi.default-wifi-password": "\"PASSWORD\""
+        },
         "RZ_A1H": {
+            "led-pin": "LED3",
+            "led-on": 1,
+            "led-off": 0,
+            "user-button": "BUTTON1",
             "target.macros_add": ["MBEDTLS_TEST_NULL_ENTROPY", "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"]
         }
     }
