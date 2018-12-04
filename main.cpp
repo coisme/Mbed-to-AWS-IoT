@@ -62,7 +62,11 @@ void messageArrived(MQTT::MessageData& md)
 {
     // Copy payload to the buffer.
     MQTT::Message &message = md.message;
-    memcpy(messageBuffer, message.payload, message.payloadlen);
+    if(message.payloadlen >= MESSAGE_BUFFER_SIZE) {
+        // TODO: handling error
+    } else {
+        memcpy(messageBuffer, message.payload, message.payloadlen);
+    }
     messageBuffer[message.payloadlen] = '\0';
 
     isMessageArrived = true;
