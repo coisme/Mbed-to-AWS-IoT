@@ -1,5 +1,6 @@
 {
     "macros": [
+        "MBEDTLS_SHA1_C=1"
     ],
     "config": {
         "main-stack-size": {
@@ -26,7 +27,6 @@
         "*": {
             "target.network-default-interface-type": "ETHERNET",
             "mbed-trace.enable": null,
-            "tls-socket.debug-level": 0,
             "platform.stdio-baud-rate": 115200,
             "platform.stdio-convert-newlines": false
            },
