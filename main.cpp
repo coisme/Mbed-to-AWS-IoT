@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 {
     mbed_trace_init();
     
-    const float version = 0.9;
+    const float version = 1.0;
     bool isSubscribed = false;
 
     NetworkInterface* network = NULL;
@@ -94,6 +94,10 @@ int main(int argc, char* argv[])
 
     printf("HelloMQTT: version is %.2f\r\n", version);
     printf("\r\n");
+
+#ifdef MBED_MAJOR_VERSION
+    printf("Mbed OS version %d.%d.%d\n\n", MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION);
+#endif
 
     printf("Opening network interface...\r\n");
     {
