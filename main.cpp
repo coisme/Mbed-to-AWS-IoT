@@ -49,6 +49,11 @@ const int MESSAGE_BUFFER_SIZE = 256;
 /* Buffer for a receiving message. */
 char messageBuffer[MESSAGE_BUFFER_SIZE];
 
+/* Enable GPIO power for Wio target */
+#if defined(TARGET_WIO_3G) || defined(TARGET_WIO_BG96)
+DigitalOut GrovePower(GRO_POWR, 1);
+#endif
+
 // An event queue is a very useful structure to debounce information between contexts (e.g. ISR and normal threads)
 // This is great because things such as network operations are illegal in ISR, so updating a resource in a button's fall() function is not allowed
 EventQueue eventQueue;
@@ -81,6 +86,7 @@ void btn1_rise_handler() {
 
 int main(int argc, char* argv[])
 {
+    thread_sleep_for(100);
     mbed_trace_init();
     
     const float version = 1.0;
@@ -241,6 +247,7 @@ int main(int argc, char* argv[])
             printf("Message published.\r\n");
             delete[] buf;    
 
+            thread_sleep_for(200);
             led = LED_OFF;
         }
     }
