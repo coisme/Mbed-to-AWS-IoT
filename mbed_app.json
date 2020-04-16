@@ -52,6 +52,47 @@
             "led-off": 0,
             "user-button": "BUTTON1",
             "target.macros_add": ["MBEDTLS_TEST_NULL_ENTROPY", "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"]
+        },
+        "WIO_3G": {
+            "led-pin": "D20",
+            "led-on": 1,
+            "led-off": 0,
+            "user-button": "D19",
+            "target.network-default-interface-type": "CELLULAR",
+            "target.device_has_remove": ["SERIAL_FC"],
+            "mbed-trace.enable": false,
+            "lwip.ipv4-enabled": true,
+            "lwip.ethernet-enabled": false,
+            "lwip.ppp-enabled": true,
+            "lwip.tcp-enabled": true,
+            "platform.default-serial-baud-rate": 115200,
+            "platform.stdio-buffered-serial": true,
+            "cellular.debug-at": false,
+            "nsapi.default-cellular-plmn": 0,
+            "nsapi.default-cellular-sim-pin": 0,
+            "nsapi.default-cellular-apn": "\"APN\"",
+            "nsapi.default-cellular-username": "\"USERNAME\"",
+            "nsapi.default-cellular-password": "\"PASSWORD\""
+        },
+        "WIO_BG96": {
+            "led-pin": "D20",
+            "led-on": 1,
+            "led-off": 0,
+            "user-button": "D19",
+            "target.network-default-interface-type": "CELLULAR",
+            "mbed-trace.enable": false,
+            "lwip.ipv4-enabled": true,
+            "lwip.ethernet-enabled": false,
+            "lwip.ppp-enabled": true,
+            "lwip.tcp-enabled": true,
+            "platform.default-serial-baud-rate": 115200,
+            "platform.stdio-buffered-serial": true,
+            "cellular.debug-at": false,
+            "nsapi.default-cellular-plmn": 0,
+            "nsapi.default-cellular-sim-pin": 0,
+            "nsapi.default-cellular-apn": "\"APN\"",
+            "nsapi.default-cellular-username": "\"USERNAME\"",
+            "nsapi.default-cellular-password": "\"PASSWORD\""
         }
     }
 }
