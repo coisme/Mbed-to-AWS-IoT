@@ -93,6 +93,20 @@
             "nsapi.default-cellular-apn": "\"APN\"",
             "nsapi.default-cellular-username": "\"USERNAME\"",
             "nsapi.default-cellular-password": "\"PASSWORD\""
+        },
+        "NUCLEO_L152RE": {
+            "led-pin": "LED1",
+            "led-on": 1,
+            "led-off": 0,
+            "user-button": "USER_BUTTON",
+            "target.macros_add": ["MBEDTLS_TEST_NULL_ENTROPY", "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"],
+            "target.network-default-interface-type" : "WIFI",
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"SSID\"",
+            "nsapi.default-wifi-password": "\"PASSWORD\"",
+            "idw0xx1.expansion-board": "IDW01M1",
+            "drivers.uart-serial-txbuf-size": 512,
+            "drivers.uart-serial-rxbuf-size": 512
         }
     }
 }
