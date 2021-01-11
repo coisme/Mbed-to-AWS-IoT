@@ -93,6 +93,13 @@
             "nsapi.default-cellular-apn": "\"APN\"",
             "nsapi.default-cellular-username": "\"USERNAME\"",
             "nsapi.default-cellular-password": "\"PASSWORD\""
+        },
+        "LPC1768": {
+            "led-pin": "LED1",
+            "led-on": 1,
+            "led-off": 0,
+            "user-button": "D10",
+            "target.macros_add": ["MBEDTLS_TEST_NULL_ENTROPY", "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"]
         }
     }
 }
